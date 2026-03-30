@@ -1,0 +1,31 @@
+{
+  "name": "remnant-from-the-ashes",
+  "version": "1.0.0",
+  "description": "Web app theo dõi tiến trình thu thập vật phẩm trong game **Remnant: From the Ashes**.",
+  "main": "data.js",
+  "scripts": {
+    "test": "jest --verbose"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dungtruong151/remnant-from-the-ashes-check-list.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dungtruong151/remnant-from-the-ashes-check-list/issues"
+  },
+  "homepage": "https://github.com/dungtruong151/remnant-from-the-ashes-check-list#readme",
+  "jest": {
+    "testEnvironment": "jsdom",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@exodus)/)"
+    ]
+  },
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "jest-environment-jsdom": "^30.3.0",
+    "jsdom": "^29.0.1"
+  }
+}

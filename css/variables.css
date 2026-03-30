@@ -1,0 +1,97 @@
+/* ============================================
+   variables.css - CSS Custom Properties & Reset
+   ============================================ */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Backgrounds */
+  --bg-primary: #f5f0eb;
+  --bg-secondary: #fff9f4;
+  --bg-card: #ffffff;
+  --bg-card-hover: #fef8f2;
+  --bg-input: #ffffff;
+
+  /* Borders */
+  --border: #e2d9cf;
+  --border-light: #d4c8ba;
+
+  /* Text */
+  --text-primary: #2c2420;
+  --text-secondary: #6b5d52;
+  --text-muted: #9c8e82;
+
+  /* Accent */
+  --accent: #c9362c;
+  --accent-light: #fdecea;
+  --accent-glow: #e04438;
+
+  /* Status colors */
+  --green: #27ae60;
+  --green-light: #eafaf1;
+  --green-dark: #1e8449;
+  --gold: #f39c12;
+  --gold-light: #fef9e7;
+  --purple: #8e44ad;
+  --purple-light: #f4ecf7;
+  --blue: #2980b9;
+  --blue-light: #eaf2f8;
+  --orange: #d35400;
+  --orange-light: #fdf2e9;
+
+  /* Rarity */
+  --rarity-normal: #7f8c8d;
+  --rarity-rare: #2980b9;
+  --rarity-boss: #d35400;
+  --rarity-dlc: #8e44ad;
+
+  /* Layout */
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow: 0 4px 15px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 30px rgba(0,0,0,0.1);
+  --transition: 0.25s ease;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-light); }
+
+/* Rarity badges */
+.rarity-badge {
+  font-size: 0.6rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.rarity-normal { background: #ecf0f1; color: var(--rarity-normal); }
+.rarity-rare { background: var(--blue-light); color: var(--rarity-rare); }
+.rarity-boss { background: var(--orange-light); color: var(--rarity-boss); }
+.rarity-dlc { background: var(--purple-light); color: var(--rarity-dlc); }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}

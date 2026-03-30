@@ -1,0 +1,120 @@
+/* ============================================
+   popup.css - Popup chi tiết item & Dialog
+   ============================================ */
+
+/* === Animations === */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* === Item Detail Popup === */
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1.5rem;
+  animation: fadeIn 0.2s ease;
+}
+
+.popup {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: slideUp 0.25s ease;
+}
+
+.popup-image {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  background: linear-gradient(135deg, #e8e0d8 0%, #d5ccc3 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  overflow: hidden;
+}
+.popup-image img { width: 100%; height: 100%; object-fit: contain; padding: 16px; }
+.popup-image .item-image-placeholder { font-size: 4rem; }
+.popup-image.collected-bg { background: linear-gradient(135deg, #d4efdf 0%, #a9dfbf 100%); }
+
+.popup-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.3);
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  backdrop-filter: blur(4px);
+}
+.popup-close:hover { background: rgba(0,0,0,0.5); transform: scale(1.1); }
+
+.popup-body { padding: 1.5rem; }
+
+.popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+.popup-title { font-size: 1.4rem; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
+.popup-rarity { font-size: 0.75rem; padding: 0.3rem 0.8rem; border-radius: 14px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; white-space: nowrap; }
+
+.popup-details { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.5rem; }
+.popup-detail-row { display: flex; align-items: flex-start; gap: 0.6rem; }
+.popup-detail-icon { width: 32px; height: 32px; min-width: 32px; border-radius: 8px; background: var(--bg-primary); display: flex; align-items: center; justify-content: center; font-size: 0.9rem; }
+.popup-detail-content { flex: 1; }
+.popup-detail-label { font-size: 0.68rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+.popup-detail-value { font-size: 0.9rem; color: var(--text-primary); font-weight: 600; }
+
+.popup-actions { display: flex; gap: 0.6rem; }
+.popup-btn { flex: 1; padding: 0.75rem 1rem; border-radius: 14px; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 700; transition: all var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.4rem; }
+.popup-btn-collect { background: var(--green); color: white; }
+.popup-btn-collect:hover { background: var(--green-dark); transform: translateY(-1px); }
+.popup-btn-collect.is-collected { background: #ecf0f1; color: var(--text-secondary); }
+.popup-btn-collect.is-collected:hover { background: #dfe6e9; }
+.popup-btn-wiki { background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--border); flex: 0; padding: 0.75rem 1.2rem; }
+.popup-btn-wiki:hover { background: var(--bg-card-hover); border-color: var(--border-light); }
+
+/* === Confirm Dialog === */
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.dialog { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 2.5rem; max-width: 400px; text-align: center; box-shadow: var(--shadow-lg); }
+.dialog h3 { margin-bottom: 0.5rem; color: var(--accent); font-size: 1.2rem; }
+.dialog p { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.dialog-actions { display: flex; gap: 0.8rem; justify-content: center; }
+.dialog-actions button { padding: 0.6rem 1.5rem; border-radius: 25px; border: none; cursor: pointer; font-size: 0.85rem; font-weight: 600; transition: all var(--transition); }
+.btn-confirm { background: var(--accent); color: white; }
+.btn-confirm:hover { background: var(--accent-glow); transform: translateY(-1px); }
+.btn-cancel { background: #ecf0f1; color: var(--text-secondary); }
+.btn-cancel:hover { background: #dfe6e9; color: var(--text-primary); }

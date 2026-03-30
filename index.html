@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Remnant: From the Ashes - Checklist Tracker</title>
-  <link rel="stylesheet" href="style.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/popup.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <link rel="stylesheet" href="css/analyzer.css">
+  <link rel="stylesheet" href="css/profiles.css">
 </head>
 <body>
   <header>
@@ -20,6 +27,13 @@
         <h1>REMNANT: FROM THE ASHES</h1>
       </div>
       <p class="subtitle">Collection Tracker</p>
+      <div style="text-align:center; margin-bottom: 0.8rem;">
+        <button class="profile-badge" id="btn-profiles">
+          <span class="profile-badge-icon">👤</span>
+          <span id="profile-indicator">...</span>
+          <span style="opacity:0.6">▾</span>
+        </button>
+      </div>
 
       <div class="progress-ring-container">
         <div class="stat-box">
@@ -54,22 +68,27 @@
           <option value="collected">Đã có</option>
           <option value="missing">Chưa có</option>
         </select>
+        <button id="btn-analyzer" class="btn-analyzer" title="Phân tích Save File">🔍 Save Analyzer</button>
         <button id="btn-reset" class="btn-danger" title="Xóa toàn bộ tiến trình">Reset</button>
       </div>
     </div>
   </header>
 
-  <nav id="category-nav">
-  </nav>
-
-  <main id="app">
-  </main>
+  <nav id="category-nav"></nav>
+  <main id="app"></main>
 
   <footer>
     <p>Remnant: From the Ashes Checklist Tracker &mdash; Dữ liệu lưu trên trình duyệt (localStorage)</p>
   </footer>
 
+  <!-- JS: load order matters -->
   <script src="data.js"></script>
-  <script src="app.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/popup.js"></script>
+  <script src="js/renderer.js"></script>
+  <script src="js/analyzer.js"></script>
+  <script src="js/profiles.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
