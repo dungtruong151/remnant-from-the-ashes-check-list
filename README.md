@@ -1,53 +1,53 @@
 # Remnant: From the Ashes - Checklist Tracker
 
-Web app theo doi tien trinh thu thap vat pham trong game **Remnant: From the Ashes**.
+Web app theo dõi tiến trình thu thập vật phẩm trong game **Remnant: From the Ashes**.
 
-## Tinh nang
+## Tính năng
 
-- Theo doi vu khi, giap, boss, traits, mods, rings, amulets, events
-- Tim kiem theo ten, dia diem, hieu ung
-- Loc theo do hiem (Normal / Rare / Boss / DLC) va trang thai (Da co / Chua co)
-- Thanh tien trinh tong the va theo tung danh muc
-- Luu tien trinh tu dong tren trinh duyet (localStorage)
-- Giao dien responsive, hoat dong tren ca desktop va mobile
+- Theo dõi vũ khí, giáp, boss, traits, mods, rings, amulets, events
+- Tìm kiếm theo tên, địa điểm, hiệu ứng
+- Lọc theo độ hiếm (Normal / Rare / Boss / DLC) và trạng thái (Đã có / Chưa có)
+- Thanh tiến trình tổng thể và theo từng danh mục
+- Lưu tiến trình tự động trên trình duyệt (localStorage)
+- Giao diện responsive, hoạt động trên cả desktop và mobile
 
-## Chay ung dung
+## Chạy ứng dụng
 
-Day la ung dung web tinh (HTML/CSS/JS thuan), khong can build hay cai dat dependency.
+Đây là ứng dụng web tĩnh (HTML/CSS/JS thuần), không cần build hay cài đặt dependency.
 
-### Cach 1: Mo truc tiep
+### Cách 1: Mở trực tiếp
 
-Mo file `index.html` bang trinh duyet bat ky (Chrome, Firefox, Edge...).
+Mở file `index.html` bằng trình duyệt bất kỳ (Chrome, Firefox, Edge...).
 
-### Cach 2: Dung Live Server (VS Code)
+### Cách 2: Dùng Live Server (VS Code)
 
-1. Cai extension **Live Server** trong VS Code
-2. Click chuot phai vao `index.html` > **Open with Live Server**
+1. Cài extension **Live Server** trong VS Code
+2. Click chuột phải vào `index.html` > **Open with Live Server**
 
-### Cach 3: Dung HTTP server
+### Cách 3: Dùng HTTP server
 
 ```bash
 # Python
 python -m http.server 8080
 
-# Node.js (can cai http-server)
+# Node.js (cần cài http-server)
 npx http-server -p 8080
 ```
 
-Sau do truy cap `http://localhost:8080` tren trinh duyet.
+Sau đó truy cập `http://localhost:8080` trên trình duyệt.
 
-## Cau truc file
+## Cấu trúc file
 
 ```
-index.html   - Trang chinh
-style.css    - Giao dien
-app.js       - Logic ung dung (render, filter, localStorage)
-data.js      - Du lieu game (vu khi, boss, traits, ...)
+index.html   - Trang chính
+style.css    - Giao diện
+app.js       - Logic ứng dụng (render, filter, localStorage)
+data.js      - Dữ liệu game (vũ khí, boss, traits, ...)
 ```
 
-## Su dung
+## Sử dụng
 
-- Click vao vat pham de danh dau **da thu thap** hoac **bo danh dau**
-- Dung thanh tim kiem va bo loc de tim vat pham can thiet
-- Nhan **Reset** de xoa toan bo tien trinh
-- Tien trinh duoc luu tu dong, dong trinh duyet va mo lai van giu nguyen
+- Click vào vật phẩm để đánh dấu **đã thu thập** hoặc **bỏ đánh dấu**
+- Dùng thanh tìm kiếm và bộ lọc để tìm vật phẩm cần thiết
+- Nhấn **Reset** để xóa toàn bộ tiến trình
+- Tiến trình được lưu tự động, đóng trình duyệt và mở lại vẫn giữ nguyên
