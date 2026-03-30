@@ -92,8 +92,8 @@ describe('Popup - showItem()', () => {
     expect(hasAltKill).toBe(true);
   });
 
-  test('KHÔNG hiển thị alt kill khi giá trị là "Khong"', () => {
-    const boss = { ...testItem, altKill: 'Khong' };
+  test('KHÔNG hiển thị alt kill khi giá trị là "Không"', () => {
+    const boss = { ...testItem, altKill: 'Không' };
     Popup.showItem(boss, 'bosses');
     const labels = document.querySelectorAll('.popup-detail-label');
     const hasAltKill = Array.from(labels).some(l => l.textContent === 'Cách giết khác');

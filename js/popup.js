@@ -95,7 +95,7 @@ const Popup = {
     if (item.guide)   rows.push(this._detailRow('📖', 'Cách lấy', item.guide));
     if (item.effect)  rows.push(this._detailRow('⚡', 'Hiệu ứng', item.effect));
     if (item.bonus)   rows.push(this._detailRow('🎯', 'Set Bonus', item.bonus));
-    if (item.altKill && item.altKill !== 'Khong') {
+    if (item.altKill && item.altKill !== 'Không') {
       rows.push(this._detailRow('💡', 'Cách giết khác', item.altKill));
     }
 

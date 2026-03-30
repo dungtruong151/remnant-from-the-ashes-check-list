@@ -144,7 +144,7 @@ const Renderer = {
     let extraHTML = '';
     if (item.effect) extraHTML += `<div class="item-extra">${item.effect}</div>`;
     if (item.bonus)  extraHTML += `<div class="item-extra">${item.bonus}</div>`;
-    if (item.altKill && item.altKill !== 'Khong') {
+    if (item.altKill && item.altKill !== 'Không') {
       extraHTML += `<div class="item-extra">Alt Kill: ${item.altKill}</div>`;
     }
 
