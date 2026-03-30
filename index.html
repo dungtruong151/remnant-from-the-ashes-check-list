@@ -10,7 +10,6 @@
   <header>
     <div class="header-content">
       <div class="header-title-row">
-        <!-- Inline SVG logo: stylized Root/Tree symbol -->
         <svg class="header-logo" viewBox="0 0 64 64" fill="none">
           <circle cx="32" cy="32" r="30" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
           <path d="M32 8 L32 28 M32 28 L22 42 M32 28 L42 42 M32 28 L28 18 Q24 22 22 42 M32 28 L36 18 Q40 22 42 42 M22 42 Q18 52 16 56 M42 42 Q46 52 48 56 M32 28 L32 48 Q32 54 32 56" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -25,7 +24,7 @@
       <div class="progress-ring-container">
         <div class="stat-box">
           <span class="stat-value" id="total-collected">0/0</span>
-          <span class="stat-label">Da thu thap</span>
+          <span class="stat-label">Đã thu thập</span>
         </div>
         <div class="progress-ring-wrapper">
           <svg class="progress-ring" width="100%" height="100%" viewBox="0 0 100 100">
@@ -37,39 +36,37 @@
         </div>
         <div class="stat-box">
           <span class="stat-value" id="total-sections">0/0</span>
-          <span class="stat-label">Danh muc</span>
+          <span class="stat-label">Danh mục</span>
         </div>
       </div>
 
       <div class="controls">
-        <input type="text" id="search-input" placeholder="Tim kiem vu khi, boss, items..." />
+        <input type="text" id="search-input" placeholder="Tìm kiếm vũ khí, boss, items..." />
         <select id="filter-rarity">
-          <option value="all">Tat ca do hiem</option>
-          <option value="normal">Normal</option>
-          <option value="rare">Rare</option>
+          <option value="all">Tất cả độ hiếm</option>
+          <option value="normal">Thường</option>
+          <option value="rare">Hiếm</option>
           <option value="boss">Boss</option>
           <option value="dlc">DLC</option>
         </select>
         <select id="filter-status">
-          <option value="all">Tat ca trang thai</option>
-          <option value="collected">Da co</option>
-          <option value="missing">Chua co</option>
+          <option value="all">Tất cả trạng thái</option>
+          <option value="collected">Đã có</option>
+          <option value="missing">Chưa có</option>
         </select>
-        <button id="btn-reset" class="btn-danger" title="Xoa toan bo tien trinh">Reset</button>
+        <button id="btn-reset" class="btn-danger" title="Xóa toàn bộ tiến trình">Reset</button>
       </div>
     </div>
   </header>
 
   <nav id="category-nav">
-    <!-- Populated by JS -->
   </nav>
 
   <main id="app">
-    <!-- Populated by JS -->
   </main>
 
   <footer>
-    <p>Remnant: From the Ashes Checklist Tracker &mdash; Du lieu luu tren trinh duyet (localStorage)</p>
+    <p>Remnant: From the Ashes Checklist Tracker &mdash; Dữ liệu lưu trên trình duyệt (localStorage)</p>
   </footer>
 
   <script src="data.js"></script>

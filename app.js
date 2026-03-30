@@ -31,11 +31,11 @@ function resetAll() {
   overlay.className = 'overlay';
   overlay.innerHTML = `
     <div class="dialog">
-      <h3>Reset toan bo?</h3>
-      <p>Tat ca tien trinh se bi xoa va khong the khoi phuc.</p>
+      <h3>Reset toàn bộ?</h3>
+      <p>Tất cả tiến trình sẽ bị xóa và không thể khôi phục.</p>
       <div class="dialog-actions">
-        <button class="btn-cancel" id="dialog-cancel">Huy</button>
-        <button class="btn-confirm" id="dialog-confirm">Xoa het</button>
+        <button class="btn-cancel" id="dialog-cancel">Hủy</button>
+        <button class="btn-confirm" id="dialog-confirm">Xóa hết</button>
       </div>
     </div>
   `;
@@ -107,6 +107,139 @@ const SECTION_ICONS = {
   events: '🎲'
 };
 
+// === ITEM DETAIL POPUP ===
+function showItemPopup(item, sectionKey) {
+  const isCollected = !!collectedItems[item.id];
+  const placeholderIcon = SECTION_ICONS[sectionKey] || '❓';
+
+  const imageContent = item.image
+    ? `<img src="${item.image}" alt="${item.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+       <div class="item-image-placeholder" style="display:none">${placeholderIcon}</div>`
+    : `<div class="item-image-placeholder">${placeholderIcon}</div>`;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'popup-overlay';
+
+  let detailRows = '';
+
+  // Location
+  detailRows += `
+    <div class="popup-detail-row">
+      <div class="popup-detail-icon">📍</div>
+      <div class="popup-detail-content">
+        <div class="popup-detail-label">Vị trí</div>
+        <div class="popup-detail-value">${item.location}</div>
+      </div>
+    </div>`;
+
+  // How to get
+  if (item.guide) {
+    detailRows += `
+    <div class="popup-detail-row">
+      <div class="popup-detail-icon">📖</div>
+      <div class="popup-detail-content">
+        <div class="popup-detail-label">Cách lấy</div>
+        <div class="popup-detail-value">${item.guide}</div>
+      </div>
+    </div>`;
+  }
+
+  // Effect / Bonus
+  if (item.effect) {
+    detailRows += `
+    <div class="popup-detail-row">
+      <div class="popup-detail-icon">⚡</div>
+      <div class="popup-detail-content">
+        <div class="popup-detail-label">Hiệu ứng</div>
+        <div class="popup-detail-value">${item.effect}</div>
+      </div>
+    </div>`;
+  }
+  if (item.bonus) {
+    detailRows += `
+    <div class="popup-detail-row">
+      <div class="popup-detail-icon">🎯</div>
+      <div class="popup-detail-content">
+        <div class="popup-detail-label">Set Bonus</div>
+        <div class="popup-detail-value">${item.bonus}</div>
+      </div>
+    </div>`;
+  }
+
+  // Alt Kill
+  if (item.altKill && item.altKill !== 'Khong') {
+    detailRows += `
+    <div class="popup-detail-row">
+      <div class="popup-detail-icon">💡</div>
+      <div class="popup-detail-content">
+        <div class="popup-detail-label">Cách giết khác</div>
+        <div class="popup-detail-value">${item.altKill}</div>
+      </div>
+    </div>`;
+  }
+
+  // Category
+  detailRows += `
+    <div class="popup-detail-row">
+      <div class="popup-detail-icon">${SECTION_ICONS[sectionKey] || '📦'}</div>
+      <div class="popup-detail-content">
+        <div class="popup-detail-label">Danh mục</div>
+        <div class="popup-detail-value">${GAME_DATA[sectionKey]?.label || sectionKey}</div>
+      </div>
+    </div>`;
+
+  // Rarity display
+  const rarityLabel = { normal: 'Thường', rare: 'Hiếm', boss: 'Boss Drop', dlc: 'DLC' }[item.rarity] || item.rarity;
+
+  // Wiki link
+  const wikiName = item.name.replace(/\s/g, '+').replace(/'/g, '%27');
+  const wikiUrl = `https://remnantfromtheashes.wiki.fextralife.com/${wikiName}`;
+
+  overlay.innerHTML = `
+    <div class="popup">
+      <div class="popup-image ${isCollected ? 'collected-bg' : ''}">
+        ${imageContent}
+        <button class="popup-close">✕</button>
+      </div>
+      <div class="popup-body">
+        <div class="popup-header">
+          <div class="popup-title">${item.name}</div>
+          <span class="popup-rarity rarity-badge rarity-${item.rarity}">${rarityLabel}</span>
+        </div>
+        <div class="popup-details">
+          ${detailRows}
+        </div>
+        <div class="popup-actions">
+          <button class="popup-btn popup-btn-collect ${isCollected ? 'is-collected' : ''}" id="popup-toggle">
+            ${isCollected ? '↩ Bỏ đánh dấu' : '✓ Đã thu thập'}
+          </button>
+          <a href="${wikiUrl}" target="_blank" rel="noopener" class="popup-btn popup-btn-wiki" title="Xem trên Wiki">🔗</a>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Close popup
+  overlay.querySelector('.popup-close').onclick = () => overlay.remove();
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  // Toggle collect
+  overlay.querySelector('#popup-toggle').onclick = () => {
+    toggleItem(item.id);
+    overlay.remove();
+  };
+
+  // Close on ESC
+  const escHandler = (e) => {
+    if (e.key === 'Escape') { overlay.remove(); document.removeEventListener('keydown', escHandler); }
+  };
+  document.addEventListener('keydown', escHandler);
+}
+
 // === RENDER NAV ===
 function renderNav() {
   const nav = document.getElementById('category-nav');
@@ -115,7 +248,7 @@ function renderNav() {
   const allBtn = document.createElement('button');
   allBtn.className = `nav-btn ${activeSection === null ? 'active' : ''}`;
   const allCount = countAll();
-  allBtn.innerHTML = `Tat ca <span class="nav-progress">${allCount.collected}/${allCount.total}</span>`;
+  allBtn.innerHTML = `Tất cả <span class="nav-progress">${allCount.collected}/${allCount.total}</span>`;
   allBtn.onclick = () => { activeSection = null; renderAll(); };
   nav.appendChild(allBtn);
 
@@ -134,7 +267,7 @@ function renderItemCard(item, sectionKey, catKey) {
   const isCollected = !!collectedItems[item.id];
   const card = document.createElement('div');
   card.className = `item-card ${isCollected ? 'collected' : ''}`;
-  card.onclick = () => toggleItem(item.id);
+  card.onclick = () => showItemPopup(item, sectionKey);
 
   let extraHTML = '';
   if (item.effect) extraHTML = `<div class="item-extra">${item.effect}</div>`;
@@ -199,7 +332,7 @@ function renderSection(key, section) {
       </div>
       <div class="section-banner-stats">
         <div class="count-text">${count.collected}/${count.total}</div>
-        <div class="count-label">${pct}% hoan thanh</div>
+        <div class="count-label">${pct}% hoàn thành</div>
       </div>
     </div>
     <div class="section-progress-bar-full">
@@ -261,7 +394,7 @@ function renderAll() {
     app.innerHTML = `
       <div class="no-results">
         <div class="no-results-icon">🔍</div>
-        Khong tim thay vat pham nao phu hop.
+        Không tìm thấy vật phẩm nào phù hợp.
       </div>`;
   }
 
