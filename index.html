@@ -3,87 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Remnant: From the Ashes - Checklist Tracker</title>
-
-  <!-- CSS -->
-  <link rel="stylesheet" href="css/variables.css">
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/popup.css">
-  <link rel="stylesheet" href="css/responsive.css">
-  <link rel="stylesheet" href="css/analyzer.css">
-  <link rel="stylesheet" href="css/profiles.css">
-  <link rel="stylesheet" href="css/builds.css">
+  <title>Remnant: From the Ashes — Checklist</title>
+  <link rel="stylesheet" href="css/main.css">
 </head>
 <body>
-  <header>
-    <div class="header-content">
-      <div class="header-title-row">
-        <svg class="header-logo" viewBox="0 0 64 64" fill="none">
-          <circle cx="32" cy="32" r="30" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-          <path d="M32 8 L32 28 M32 28 L22 42 M32 28 L42 42 M32 28 L28 18 Q24 22 22 42 M32 28 L36 18 Q40 22 42 42 M22 42 Q18 52 16 56 M42 42 Q46 52 48 56 M32 28 L32 48 Q32 54 32 56" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="32" cy="8" r="3" fill="rgba(255,255,255,0.8)"/>
-          <circle cx="22" cy="42" r="2" fill="rgba(255,255,255,0.5)"/>
-          <circle cx="42" cy="42" r="2" fill="rgba(255,255,255,0.5)"/>
-        </svg>
-        <h1>REMNANT: FROM THE ASHES</h1>
-      </div>
-      <p class="subtitle">Collection Tracker</p>
-      <div style="text-align:center; margin-bottom: 0.8rem;">
-        <button class="profile-badge" id="btn-profiles">
-          <span class="profile-badge-icon">👤</span>
-          <span id="profile-indicator">...</span>
-          <span style="opacity:0.6">▾</span>
-        </button>
-      </div>
 
-      <div class="progress-ring-container">
-        <div class="stat-box">
-          <span class="stat-value" id="total-collected">0/0</span>
-          <span class="stat-label">Đã thu thập</span>
-        </div>
-        <div class="progress-ring-wrapper">
-          <svg class="progress-ring" width="100%" height="100%" viewBox="0 0 100 100">
-            <circle class="progress-ring-bg" cx="50" cy="50" r="42"/>
-            <circle class="progress-ring-fill" id="progress-ring-circle" cx="50" cy="50" r="42"
-              stroke-dasharray="263.89" stroke-dashoffset="263.89"/>
-          </svg>
-          <span class="progress-ring-text" id="total-progress">0%</span>
-        </div>
-        <div class="stat-box">
-          <span class="stat-value" id="total-sections">0/0</span>
-          <span class="stat-label">Danh mục</span>
-        </div>
-      </div>
-
-      <div class="controls">
-        <input type="text" id="search-input" placeholder="Tìm kiếm vũ khí, boss, items..." />
-        <select id="filter-rarity">
-          <option value="all">Tất cả độ hiếm</option>
-          <option value="normal">Thường</option>
-          <option value="rare">Hiếm</option>
-          <option value="boss">Boss</option>
-          <option value="dlc">DLC</option>
-        </select>
-        <select id="filter-status">
-          <option value="all">Tất cả trạng thái</option>
-          <option value="collected">Đã có</option>
-          <option value="missing">Chưa có</option>
-        </select>
-        <button id="btn-builds" class="btn-analyzer" title="Pro Builds">🏆 Pro Builds</button>
-        <button id="btn-analyzer" class="btn-analyzer" title="Phân tích Save File">🔍 Save Analyzer</button>
-        <button id="btn-reset" class="btn-danger" title="Xóa toàn bộ tiến trình">Reset</button>
-      </div>
+  <div id="topbar">
+    <div id="topbar-left">
+      <span id="game-title">REMNANT: FROM THE ASHES</span>
+      <span id="progress-text"><span id="total-collected">0/0</span> items · <span id="total-progress">0%</span></span>
     </div>
-  </header>
+    <div id="topbar-right">
+      <button id="btn-profiles" class="tb-btn">👤 <span id="profile-indicator">...</span></button>
+      <button id="btn-builds" class="tb-btn">🏆 Builds</button>
+      <button id="btn-analyzer" class="tb-btn">🔍 Analyzer</button>
+      <button id="btn-reset" class="tb-btn tb-btn--danger">Reset</button>
+    </div>
+  </div>
+
+  <div id="toolbar">
+    <input type="text" id="search-input" placeholder="Tìm kiếm..." />
+    <select id="filter-rarity">
+      <option value="all">Tất cả</option>
+      <option value="normal">Thường</option>
+      <option value="rare">Hiếm</option>
+      <option value="boss">Boss</option>
+      <option value="dlc">DLC</option>
+    </select>
+    <select id="filter-status">
+      <option value="all">Mọi trạng thái</option>
+      <option value="collected">Đã có</option>
+      <option value="missing">Chưa có</option>
+    </select>
+    <div id="progress-bar-wrap"><div id="progress-bar-fill"></div></div>
+    <span id="total-sections-text">0/0 danh mục</span>
+  </div>
 
   <nav id="category-nav"></nav>
   <main id="app"></main>
 
-  <footer>
-    <p>Remnant: From the Ashes Checklist Tracker &mdash; Dữ liệu lưu trên trình duyệt (localStorage)</p>
-  </footer>
-
-  <!-- JS: load order matters -->
   <script src="data.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/state.js"></script>

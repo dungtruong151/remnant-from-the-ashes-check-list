@@ -55,7 +55,7 @@ describe('Renderer - renderAll()', () => {
     Renderer.renderAll();
     expect(document.getElementById('total-progress').textContent).toBe('0%');
     expect(document.getElementById('total-collected').textContent).toBe('0/299');
-    expect(document.getElementById('total-sections').textContent).toBe('0/7');
+    expect(document.getElementById('total-sections-text').textContent).toBe('0/7 danh mục');
   });
 });
 

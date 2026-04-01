@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:remnantfromtheashes.wiki.fextralife.com)",
+      "WebFetch(domain:remnantfromtheashes.fandom.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:www.remnant2toolkit.com)",
+      "WebFetch(domain:www.windowscentral.com)",
+      "Bash(node -e \":*)",
+      "WebFetch(domain:www.gamepressure.com)",
+      "WebFetch(domain:en.namu.wiki)",
+      "WebFetch(domain:www.thegamer.com)",
+      "WebFetch(domain:holdtoreset.com)",
+      "WebFetch(domain:gamerant.com)",
+      "WebFetch(domain:gamerdiscovery.com)",
+      "WebFetch(domain:remnant.standardof.net)",
+      "WebFetch(domain:www.getdroidtips.com)",
+      "WebFetch(domain:www.iskmogul.com)",
+      "WebFetch(domain:progameguides.com)",
+      "WebFetch(domain:www.gamepur.com)",
+      "WebFetch(domain:remnant2.wiki.gg)",
+      "WebFetch(domain:nintendosmash.com)"
+    ]
+  }
+}

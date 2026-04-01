@@ -181,14 +181,13 @@ const Renderer = {
     document.getElementById('total-progress').textContent = `${pct}%`;
     document.getElementById('total-collected').textContent = `${all.collected}/${all.total}`;
 
-    // Progress ring
-    const circle = document.getElementById('progress-ring-circle');
-    const circumference = 2 * Math.PI * 42;
-    circle.style.strokeDasharray = circumference;
-    circle.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+    // Progress bar
+    const fill = document.getElementById('progress-bar-fill');
+    if (fill) fill.style.width = `${pct}%`;
 
     // Sections completed
     const sections = State.countCompletedSections();
-    document.getElementById('total-sections').textContent = `${sections.completed}/${sections.total}`;
+    const sectEl = document.getElementById('total-sections-text');
+    if (sectEl) sectEl.textContent = `${sections.completed}/${sections.total} danh mục`;
   },
 };
