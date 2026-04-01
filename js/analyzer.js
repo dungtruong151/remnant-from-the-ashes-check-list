@@ -70,7 +70,136 @@ const Analyzer = {
   },
 
   /**
-   * Hiển thị panel analyzer
+   * Render analyzer trực tiếp vào page (không phải popup)
+   */
+  renderPage() {
+    const container = document.getElementById('analyzer-page-content');
+    if (!container) return;
+    const hasFile = !!this._fileHandle;
+
+    container.innerHTML = `
+      <div class="analyzer-upload-zone">
+        <div class="analyzer-btn-row">
+          <button class="analyzer-btn analyzer-btn-pick" id="ap-pick">
+            📂 ${hasFile ? 'Chọn file khác' : 'Chọn file save'}
+          </button>
+          ${hasFile ? `<button class="analyzer-btn analyzer-btn-reload" id="ap-reload">🔄 Reload</button>` : ''}
+        </div>
+        ${hasFile ? `
+          <div class="analyzer-file-status">
+            <span>📎 ${this._fileHandle.name}</span>
+            <span style="opacity:0.7;font-size:11px">Nhấn Reload sau khi reroll world mới</span>
+          </div>` : `
+          <div class="analyzer-drop-zone" id="ap-drop">
+            <div class="drop-icon">📁</div>
+            <div class="drop-text">Kéo thả file save vào đây</div>
+            <div class="drop-sub">.sav / .bak</div>
+          </div>`}
+      </div>
+
+      ${this._lastData ? `
+      <div class="analyzer-results-section">
+        <div class="analyzer-mode-tabs">
+          <button class="analyzer-tab active" data-mode="campaign">Campaign</button>
+          <button class="analyzer-tab" data-mode="adventure">Adventure</button>
+        </div>
+        <div id="ap-worlds" class="analyzer-worlds"></div>
+      </div>` : ''}
+    `;
+
+    // Bind pick
+    container.querySelector('#ap-pick')?.addEventListener('click', () => this._pickFileForPage(container));
+
+    // Bind reload
+    container.querySelector('#ap-reload')?.addEventListener('click', async () => {
+      if (!this._fileHandle) return;
+      const btn = container.querySelector('#ap-reload');
+      btn.disabled = true; btn.textContent = '⏳ Đang đọc...';
+      try { const file = await this._fileHandle.getFile(); this._processFileForPage(file, null, container); }
+      catch { this._fileHandle = null; this.renderPage(); }
+    });
+
+    // Bind drop
+    const dropZone = container.querySelector('#ap-drop');
+    if (dropZone) {
+      dropZone.onclick = () => this._pickFileForPage(container);
+      ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('highlight'); }));
+      ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('highlight'); }));
+      dropZone.addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) this._processFileForPage(f, null, container); });
+    }
+
+    // Mode tabs
+    container.querySelectorAll('.analyzer-tab').forEach(tab => {
+      tab.onclick = () => {
+        container.querySelectorAll('.analyzer-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        const data = tab.dataset.mode === 'adventure' ? this._lastData?.adventure : this._lastData?.campaign;
+        this._renderWorldsInPage(data, container.querySelector('#ap-worlds'));
+      };
+    });
+
+    // Render default campaign data
+    if (this._lastData) {
+      this._renderWorldsInPage(this._lastData.campaign, container.querySelector('#ap-worlds'));
+    }
+  },
+
+  async _pickFileForPage(container) {
+    if (window.showOpenFilePicker) {
+      try {
+        const [handle] = await window.showOpenFilePicker({ types: [{ description: 'Save File', accept: { 'application/octet-stream': ['.sav','.bak'] } }] });
+        this._fileHandle = handle;
+        const file = await handle.getFile();
+        this._processFileForPage(file, handle, container);
+        return;
+      } catch(e) { if (e.name === 'AbortError') return; }
+    }
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.sav,.bak';
+    input.onchange = e => { const f = e.target.files[0]; if (f) this._processFileForPage(f, null, container); };
+    input.click();
+  },
+
+  _processFileForPage(file, handle, container) {
+    if (handle) this._fileHandle = handle;
+    const reader = new FileReader();
+    reader.onload = e => {
+      const raw = e.target.result;
+      this._lastData = { campaign: this._parseCampaign(raw), adventure: this._parseAdventure(raw) };
+      this.renderPage();
+    };
+    reader.readAsText(file);
+  },
+
+  _renderWorldsInPage(events, container) {
+    if (!container) return;
+    if (!events || !events.length) {
+      container.innerHTML = '<div class="analyzer-empty">Không tìm thấy dữ liệu. Hãy đến ít nhất 1 checkpoint trong game trước.</div>';
+      return;
+    }
+    const byWorld = {};
+    for (const e of events) { if (!byWorld[e.world]) byWorld[e.world] = []; byWorld[e.world].push(e); }
+    container.innerHTML = Object.entries(byWorld).map(([world, evts]) => `
+      <div class="analyzer-world">
+        <div class="analyzer-world-header">
+          <span>${world}</span>
+          <span class="analyzer-world-count">${evts.length} items</span>
+        </div>
+        <div class="analyzer-events">
+          ${evts.map(ev => {
+            const cls = ev.type.includes('Boss') ? 'type-boss' : ev.type.includes('Dungeon') ? 'type-dungeon' : ev.type.includes('Event') || ev.type.includes('Interest') ? 'type-event' : 'type-other';
+            return `<div class="analyzer-event">
+              <span class="event-type-tag ${cls}">${ev.type}</span>
+              <span class="event-name">${ev.name}</span>
+              ${ev.sublocation ? `<span class="event-sub">${ev.sublocation}</span>` : ''}
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`).join('');
+  },
+
+  /**
+   * Hiển thị panel analyzer (legacy popup - giữ lại để không break)
    */
   showPanel() {
     const hasFile = !!this._fileHandle;

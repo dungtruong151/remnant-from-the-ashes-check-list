@@ -181,9 +181,11 @@ const Renderer = {
     document.getElementById('total-progress').textContent = `${pct}%`;
     document.getElementById('total-collected').textContent = `${all.collected}/${all.total}`;
 
-    // Progress bar
-    const fill = document.getElementById('progress-bar-fill');
-    if (fill) fill.style.width = `${pct}%`;
+    // Sidebar progress bar
+    const sidebarFill = document.getElementById('sidebar-progress-fill');
+    if (sidebarFill) sidebarFill.style.width = `${pct}%`;
+    const sidebarText = document.getElementById('sidebar-progress-text');
+    if (sidebarText) sidebarText.textContent = `${all.collected} / ${all.total} items`;
 
     // Sections completed
     const sections = State.countCompletedSections();

@@ -1,24 +1,33 @@
 /**
- * app.js - Entry point: khởi tạo profile system, gắn event listeners
+ * app.js - Entry point: page routing, init
  */
 
 (function init() {
-  // Khởi tạo profile system (migrate data cũ nếu cần)
   Storage.init();
   State.collected = Storage.load();
 
-  // Event listeners
+  // === Page routing ===
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`page-${name}`)?.classList.add('active');
+    document.querySelector(`.page-btn[data-page="${name}"]`)?.classList.add('active');
+
+    if (name === 'builds') Builds.renderPage();
+    if (name === 'analyzer') Analyzer.renderPage();
+  }
+
+  document.querySelectorAll('.page-btn').forEach(btn => {
+    btn.addEventListener('click', () => showPage(btn.dataset.page));
+  });
+
+  // === Checklist controls ===
   document.getElementById('search-input').addEventListener('input', () => Renderer.renderAll());
   document.getElementById('filter-rarity').addEventListener('change', () => Renderer.renderAll());
   document.getElementById('filter-status').addEventListener('change', () => Renderer.renderAll());
   document.getElementById('btn-reset').addEventListener('click', () => Popup.showResetConfirm());
-  document.getElementById('btn-builds').addEventListener('click', () => Builds.showPanel());
-  document.getElementById('btn-analyzer').addEventListener('click', () => Analyzer.showPanel());
   document.getElementById('btn-profiles').addEventListener('click', () => Profiles.showPanel());
 
-  // Hiển thị tên profile hiện tại
   Profiles.initIndicator();
-
-  // Render
   Renderer.renderAll();
 })();
