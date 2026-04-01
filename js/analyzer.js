@@ -138,6 +138,20 @@ const Analyzer = {
       this._lastData = null;
       this._renderUpload(container);
     };
+
+    // Click card → mở popup chi tiết
+    container.querySelectorAll('.acard--clickable').forEach(card => {
+      card.onclick = () => {
+        const itemId = card.dataset.itemId;
+        const sectionKey = card.dataset.sectionKey;
+        if (!itemId || !sectionKey) return;
+        // Tìm item object từ GAME_DATA
+        for (const cat of Object.values(GAME_DATA[sectionKey]?.categories || {})) {
+          const item = cat.items.find(i => i.id === itemId);
+          if (item) { Popup.showItem(item, sectionKey); return; }
+        }
+      };
+    });
   },
 
   _renderWorlds(events) {
@@ -168,13 +182,15 @@ const Analyzer = {
           const item = this._findItem(e.name);
           const collected = item && State.isCollected(item.id);
           const hasImg = item?.image;
+          const clickable = !!item;
 
           const img = hasImg
             ? `<img src="${item.image}" alt="${e.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-img')">`
             : '';
 
           return `
-            <div class="acard ${collected ? 'acard--collected' : ''} ${hasImg ? '' : 'acard--no-img'}">
+            <div class="acard ${collected ? 'acard--collected' : ''} ${hasImg ? '' : 'acard--no-img'} ${clickable ? 'acard--clickable' : ''}"
+                 ${clickable ? `data-item-id="${item.id}" data-section-key="${item._sectionKey}"` : ''}>
               <div class="acard-img">${img}<span class="acard-img-placeholder">${collected ? '✓' : ''}</span></div>
               <div class="acard-body">
                 <div class="acard-name">${e.name}</div>
@@ -211,16 +227,18 @@ const Analyzer = {
 
   // === Checklist integration ===
 
-  /** Tìm item trong GAME_DATA khớp với tên event từ analyzer */
+  /** Tìm item + sectionKey trong GAME_DATA khớp với tên event */
   _findItem(eventName) {
     if (!eventName) return null;
     const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
     const target = norm(eventName);
-    for (const sec of Object.values(GAME_DATA)) {
+    for (const [sk, sec] of Object.entries(GAME_DATA)) {
       for (const cat of Object.values(sec.categories)) {
         for (const item of cat.items) {
           const n = norm(item.name);
-          if (n === target || n.includes(target) || target.includes(n)) return item;
+          if (n === target || n.includes(target) || target.includes(n)) {
+            return { ...item, _sectionKey: sk };
+          }
         }
       }
     }

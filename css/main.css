@@ -703,6 +703,8 @@ body {
 }
 .acard:hover { border-color: var(--border-2); box-shadow: var(--shadow-sm); }
 .acard--collected { border-color: #86efac; background: var(--green-bg); }
+.acard--clickable { cursor: pointer; }
+.acard--clickable:hover { border-color: var(--accent); box-shadow: var(--shadow); transform: translateY(-2px); }
 
 /* Card image */
 .acard-img {
