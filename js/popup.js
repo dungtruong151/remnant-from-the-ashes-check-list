@@ -92,7 +92,7 @@ const Popup = {
 
     rows.push(this._detailRow('📍', 'Vị trí', item.location));
 
-    if (item.guide)   rows.push(this._detailRow('📖', 'Cách lấy', item.guide));
+    if (item.guide)   rows.push(this._guideBlock(item.guide));
     if (item.effect)  rows.push(this._detailRow('⚡', 'Hiệu ứng', item.effect));
     if (item.bonus)   rows.push(this._detailRow('🎯', 'Set Bonus', item.bonus));
     if (item.altKill && item.altKill !== 'Không') {
@@ -104,6 +104,57 @@ const Popup = {
     rows.push(this._detailRow(sectionIcon, 'Danh mục', sectionLabel));
 
     return rows.join('');
+  },
+
+  /**
+   * Render guide text thành dạng có cấu trúc dễ đọc.
+   * Tách theo dấu câu / dấu chấm chấm / step number.
+   */
+  _guideBlock(text) {
+    if (!text) return '';
+
+    // Tách thành các sentences/steps có ý nghĩa
+    const sentences = text
+      // Tách tại: ". ", " → ", ". Bước ", ". Sau ", ". Khi ", ". Nếu ", ". Alt kill"
+      .split(/(?<=\.)\s+(?=[A-ZĐÁÀẢÃẠĂẮẰẲẴẶÂẤẦẨẪẬÉÈẺẼẸÊẾỀỂỄỆÍÌỈĨỊÓÒỎÕỌÔỐỒỔỖỘƠỚỜỞỠỢÚÙỦŨỤƯỨỪỬỮỰÝỲỶỸỴ])|(?:\.\s+(?=Bước|Sau đó|Khi|Nếu|Alt|Lưu ý|Drop|Nhận|Mang|Dùng|Craft|Mua|Tìm|Đây))|→\s+/g)
+      .map(s => s.trim())
+      .filter(s => s.length > 3);
+
+    // Nếu chỉ có 1 sentence ngắn, không cần list
+    if (sentences.length <= 1 || text.length < 120) {
+      return `
+        <div class="popup-detail-row">
+          <div class="popup-detail-icon">📖</div>
+          <div class="popup-detail-label">Cách lấy</div>
+          <div class="popup-detail-value">${text}</div>
+        </div>`;
+    }
+
+    // Detect keyword → icon
+    const getIcon = (s) => {
+      const lower = s.toLowerCase();
+      if (/craft|mccabe|lumenite|scrap/.test(lower)) return '🔨';
+      if (/boss|giết|đánh|combat|phase|chiến thuật|dodge|né|bắn|tấn công/.test(lower)) return '⚔️';
+      if (/drop|nhận|vật phẩm|material|ore|heart|shard/.test(lower)) return '📦';
+      if (/mua|scrap|vendor|rigs|merchant/.test(lower)) return '🛒';
+      if (/alt kill|cách giết khác|phá|cắt|đưa/.test(lower)) return '💡';
+      if (/lưu ý|quan trọng|chú ý/.test(lower)) return '⚠️';
+      if (/hardcore|survival mode/.test(lower)) return '🏆';
+      if (/dlc|subject|swamps/.test(lower)) return '📀';
+      return '→';
+    };
+
+    const steps = sentences.map(s => {
+      // Làm sạch dấu câu dư ở đầu
+      const clean = s.replace(/^[.\s→]+/, '').trim();
+      return `<li class="guide-step"><span class="guide-step-icon">${getIcon(clean)}</span><span>${clean}</span></li>`;
+    }).join('');
+
+    return `
+      <div class="popup-guide-block">
+        <div class="popup-guide-label">📖 Cách lấy</div>
+        <ul class="guide-steps">${steps}</ul>
+      </div>`;
   },
 
   _detailRow(icon, label, value) {
