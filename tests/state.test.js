@@ -48,7 +48,7 @@ describe('State - Toggle items', () => {
 describe('State - Counting', () => {
   test('countAll() trả đúng khi chưa collect gì', () => {
     const c = State.countAll();
-    expect(c.total).toBe(279);
+    expect(c.total).toBe(299);
     expect(c.collected).toBe(0);
   });
 
@@ -64,7 +64,7 @@ describe('State - Counting', () => {
     State.toggle('hunting_rifle');
     State.toggle('shotgun');
     const c = State.countSection(GAME_DATA.weapons);
-    expect(c.total).toBe(48);
+    expect(c.total).toBe(49);
     expect(c.collected).toBe(2);
   });
 
