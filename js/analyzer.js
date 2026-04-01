@@ -1,16 +1,15 @@
 /**
- * analyzer.js - Phân tích save file game Remnant: From the Ashes
- * Dựa trên: https://github.com/hzla/Remnant-World-Analyzer
- * Sử dụng File System Access API để nhớ file handle → reload không cần chọn lại
+ * analyzer.js — Save File Analyzer
+ * Chức năng: upload file .sav/.bak → parse → hiển thị world content
+ * Tham khảo: https://github.com/hzla/Remnant-World-Analyzer
  */
 
 const Analyzer = {
-  // File handle lưu lại sau lần chọn đầu tiên
-  _fileHandle: null,
   _lastData: null,
-  _overlay: null,
+  _activeMode: 'campaign',
 
-  // Mapping tên internal → tên hiển thị
+  // === Name mappings ===
+
   _nameMap: {
     FlickeringHorror: 'Dream Eater', Wisp: 'Hive Wisps', TheRisen: 'Reanimators',
     LizAndLiz: 'Chicago Typewriter', Fatty: 'The Unclean One', WastelandGuardian: 'Claviger',
@@ -69,333 +68,152 @@ const Analyzer = {
     IceSkimmer: 'The Frieran Sea', CreepersPeeper: "Watcher's Hollow",
   },
 
-  /**
-   * Render analyzer trực tiếp vào page (không phải popup)
-   */
+  // === Page rendering ===
+
   renderPage() {
     const container = document.getElementById('analyzer-page-content');
     if (!container) return;
-    const hasFile = !!this._fileHandle;
 
+    if (!this._lastData) {
+      this._renderUpload(container);
+    } else {
+      this._renderResults(container);
+    }
+  },
+
+  _renderUpload(container) {
     container.innerHTML = `
-      <div class="analyzer-upload-zone">
-        <div class="analyzer-btn-row">
-          <button class="analyzer-btn analyzer-btn-pick" id="ap-pick">
-            📂 ${hasFile ? 'Chọn file khác' : 'Chọn file save'}
-          </button>
-          ${hasFile ? `<button class="analyzer-btn analyzer-btn-reload" id="ap-reload">🔄 Reload</button>` : ''}
-        </div>
-        ${hasFile ? `
-          <div class="analyzer-file-status">
-            <span>📎 ${this._fileHandle.name}</span>
-            <span style="opacity:0.7;font-size:11px">Nhấn Reload sau khi reroll world mới</span>
-          </div>` : `
-          <div class="analyzer-drop-zone" id="ap-drop">
-            <div class="drop-icon">📁</div>
-            <div class="drop-text">Kéo thả file save vào đây</div>
-            <div class="drop-sub">.sav / .bak</div>
-          </div>`}
+      <div class="analyzer-drop-zone" id="ap-drop">
+        <div class="drop-icon">📁</div>
+        <div class="drop-text">Kéo thả hoặc click để chọn file save</div>
+        <div class="drop-sub">save_0.sav &nbsp;·&nbsp; save_0.bak</div>
+        <div class="drop-path">%LOCALAPPDATA%\\Remnant\\Saved\\SaveGames\\</div>
+        <input type="file" id="ap-file-input" accept=".sav,.bak" style="display:none">
       </div>
-
-      ${this._lastData ? `
-      <div class="analyzer-results-section">
-        <div class="analyzer-mode-tabs">
-          <button class="analyzer-tab active" data-mode="campaign">Campaign</button>
-          <button class="analyzer-tab" data-mode="adventure">Adventure</button>
-        </div>
-        <div id="ap-worlds" class="analyzer-worlds"></div>
-      </div>` : ''}
     `;
 
-    // Bind pick
-    container.querySelector('#ap-pick')?.addEventListener('click', () => this._pickFileForPage(container));
+    const drop = container.querySelector('#ap-drop');
+    const fileInput = container.querySelector('#ap-file-input');
 
-    // Bind reload
-    container.querySelector('#ap-reload')?.addEventListener('click', async () => {
-      if (!this._fileHandle) return;
-      const btn = container.querySelector('#ap-reload');
-      btn.disabled = true; btn.textContent = '⏳ Đang đọc...';
-      try { const file = await this._fileHandle.getFile(); this._processFileForPage(file, null, container); }
-      catch { this._fileHandle = null; this.renderPage(); }
+    drop.onclick = () => fileInput.click();
+    fileInput.onchange = e => { if (e.target.files[0]) this._readFile(e.target.files[0]); };
+
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('highlight'); });
+    drop.addEventListener('dragleave', () => drop.classList.remove('highlight'));
+    drop.addEventListener('drop', e => {
+      e.preventDefault();
+      drop.classList.remove('highlight');
+      if (e.dataTransfer.files[0]) this._readFile(e.dataTransfer.files[0]);
     });
+  },
 
-    // Bind drop
-    const dropZone = container.querySelector('#ap-drop');
-    if (dropZone) {
-      dropZone.onclick = () => this._pickFileForPage(container);
-      ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('highlight'); }));
-      ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('highlight'); }));
-      dropZone.addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) this._processFileForPage(f, null, container); });
-    }
+  _renderResults(container) {
+    const data = this._activeMode === 'adventure'
+      ? this._lastData.adventure
+      : this._lastData.campaign;
 
-    // Mode tabs
+    const hasAdventure = this._lastData.adventure.length > 0;
+
+    container.innerHTML = `
+      <div class="analyzer-toolbar">
+        <div class="analyzer-tabs">
+          <button class="analyzer-tab ${this._activeMode === 'campaign' ? 'active' : ''}" data-mode="campaign">Campaign</button>
+          <button class="analyzer-tab ${this._activeMode === 'adventure' ? 'active' : ''}" data-mode="adventure">Adventure ${!hasAdventure ? '(không có)' : ''}</button>
+        </div>
+        <button class="analyzer-new-file-btn" id="ap-new">↑ Tải file khác</button>
+      </div>
+      <div id="ap-worlds" class="analyzer-worlds">
+        ${this._renderWorlds(data)}
+      </div>
+    `;
+
     container.querySelectorAll('.analyzer-tab').forEach(tab => {
       tab.onclick = () => {
-        container.querySelectorAll('.analyzer-tab').forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        const data = tab.dataset.mode === 'adventure' ? this._lastData?.adventure : this._lastData?.campaign;
-        this._renderWorldsInPage(data, container.querySelector('#ap-worlds'));
+        this._activeMode = tab.dataset.mode;
+        this._renderResults(container);
       };
     });
 
-    // Render default campaign data
-    if (this._lastData) {
-      this._renderWorldsInPage(this._lastData.campaign, container.querySelector('#ap-worlds'));
-    }
+    container.querySelector('#ap-new').onclick = () => {
+      this._lastData = null;
+      this._renderUpload(container);
+    };
   },
 
-  async _pickFileForPage(container) {
-    if (window.showOpenFilePicker) {
-      try {
-        const [handle] = await window.showOpenFilePicker({ types: [{ description: 'Save File', accept: { 'application/octet-stream': ['.sav','.bak'] } }] });
-        this._fileHandle = handle;
-        const file = await handle.getFile();
-        this._processFileForPage(file, handle, container);
-        return;
-      } catch(e) { if (e.name === 'AbortError') return; }
+  _renderWorlds(events) {
+    if (!events || !events.length) {
+      return '<div class="analyzer-empty">Không tìm thấy dữ liệu.<br>Hãy chắc chắn đã đến ít nhất 1 checkpoint (red crystal) trong game trước.</div>';
     }
-    const input = document.createElement('input');
-    input.type = 'file'; input.accept = '.sav,.bak';
-    input.onchange = e => { const f = e.target.files[0]; if (f) this._processFileForPage(f, null, container); };
-    input.click();
+
+    // Group by world
+    const byWorld = {};
+    for (const e of events) {
+      if (!byWorld[e.world]) byWorld[e.world] = [];
+      byWorld[e.world].push(e);
+    }
+
+    // Group each world by type
+    const typeOrder = ['World Boss', 'Side Dungeon', 'Point of Interest', 'Siege', 'Miniboss', 'Event'];
+    const typeLabel = {
+      'World Boss': 'World Boss',
+      'Side Dungeon': 'Dungeon',
+      'Point of Interest': 'POI',
+      'Siege': 'Siege',
+      'Miniboss': 'Miniboss',
+      'Event': 'Event',
+    };
+    const typeCls = {
+      'World Boss': 'type-boss',
+      'Side Dungeon': 'type-dungeon',
+      'Point of Interest': 'type-event',
+      'Siege': 'type-other',
+      'Miniboss': 'type-other',
+      'Event': 'type-event',
+    };
+
+    return Object.entries(byWorld).map(([world, evts]) => {
+      const byType = {};
+      for (const e of evts) {
+        if (!byType[e.type]) byType[e.type] = [];
+        byType[e.type].push(e);
+      }
+
+      const rows = typeOrder
+        .filter(t => byType[t])
+        .flatMap(t => byType[t].map(e => `
+          <div class="analyzer-event">
+            <span class="event-type-tag ${typeCls[t]}">${typeLabel[t]}</span>
+            <span class="event-name">${e.name}</span>
+            ${e.sublocation ? `<span class="event-sub">${e.sublocation}</span>` : ''}
+          </div>`))
+        .join('');
+
+      return `
+        <div class="analyzer-world">
+          <div class="analyzer-world-header">
+            <span>${world}</span>
+            <span class="analyzer-world-count">${evts.length} items</span>
+          </div>
+          <div class="analyzer-events">${rows}</div>
+        </div>`;
+    }).join('');
   },
 
-  _processFileForPage(file, handle, container) {
-    if (handle) this._fileHandle = handle;
+  // === File reading & parsing ===
+
+  _readFile(file) {
     const reader = new FileReader();
     reader.onload = e => {
       const raw = e.target.result;
-      this._lastData = { campaign: this._parseCampaign(raw), adventure: this._parseAdventure(raw) };
+      this._lastData = {
+        campaign: this._parseCampaign(raw),
+        adventure: this._parseAdventure(raw),
+      };
+      this._activeMode = 'campaign';
       this.renderPage();
     };
     reader.readAsText(file);
   },
-
-  _renderWorldsInPage(events, container) {
-    if (!container) return;
-    if (!events || !events.length) {
-      container.innerHTML = '<div class="analyzer-empty">Không tìm thấy dữ liệu. Hãy đến ít nhất 1 checkpoint trong game trước.</div>';
-      return;
-    }
-    const byWorld = {};
-    for (const e of events) { if (!byWorld[e.world]) byWorld[e.world] = []; byWorld[e.world].push(e); }
-    container.innerHTML = Object.entries(byWorld).map(([world, evts]) => `
-      <div class="analyzer-world">
-        <div class="analyzer-world-header">
-          <span>${world}</span>
-          <span class="analyzer-world-count">${evts.length} items</span>
-        </div>
-        <div class="analyzer-events">
-          ${evts.map(ev => {
-            const cls = ev.type.includes('Boss') ? 'type-boss' : ev.type.includes('Dungeon') ? 'type-dungeon' : ev.type.includes('Event') || ev.type.includes('Interest') ? 'type-event' : 'type-other';
-            return `<div class="analyzer-event">
-              <span class="event-type-tag ${cls}">${ev.type}</span>
-              <span class="event-name">${ev.name}</span>
-              ${ev.sublocation ? `<span class="event-sub">${ev.sublocation}</span>` : ''}
-            </div>`;
-          }).join('')}
-        </div>
-      </div>`).join('');
-  },
-
-  /**
-   * Hiển thị panel analyzer (legacy popup - giữ lại để không break)
-   */
-  showPanel() {
-    const hasFile = !!this._fileHandle;
-    const overlay = document.createElement('div');
-    overlay.className = 'popup-overlay';
-    this._overlay = overlay;
-
-    overlay.innerHTML = `
-      <div class="popup analyzer-popup">
-        <div class="popup-body">
-          <div class="popup-header">
-            <div class="popup-title">🔍 Phân tích Save File</div>
-            <button class="popup-close">✕</button>
-          </div>
-
-          <div class="analyzer-intro">
-            <p>Phân tích file save game để xem world hiện tại có những boss, event, dungeon nào.</p>
-            <p class="analyzer-path">📂 <code>%LOCALAPPDATA%\\Remnant\\Saved\\SaveGames\\save_0.sav</code></p>
-          </div>
-
-          <div class="analyzer-actions">
-            <button class="analyzer-btn analyzer-btn-pick" id="analyzer-pick">
-              📂 ${hasFile ? 'Chọn file khác' : 'Chọn file save'}
-            </button>
-            ${hasFile ? `
-              <button class="analyzer-btn analyzer-btn-reload" id="analyzer-reload">
-                🔄 Reload (đọc lại file)
-              </button>
-            ` : ''}
-          </div>
-
-          ${!hasFile ? `
-          <div class="analyzer-drop" id="analyzer-drop">
-            <div class="analyzer-drop-icon">📁</div>
-            <div class="analyzer-drop-text">Hoặc kéo thả file save vào đây</div>
-            <div class="analyzer-drop-sub">.sav / .bak</div>
-          </div>
-          ` : ''}
-
-          ${hasFile ? `
-          <div class="analyzer-file-info" id="analyzer-file-info">
-            📎 Đang dùng: <strong>${this._fileHandle.name}</strong>
-            <span class="analyzer-file-hint">— Nhấn Reload sau khi reroll world mới</span>
-          </div>
-          ` : ''}
-
-          <div class="analyzer-results" id="analyzer-results" style="display:${hasFile && this._lastData ? 'block' : 'none'}">
-            <div class="analyzer-mode-toggle">
-              <button class="analyzer-mode-btn active" data-mode="campaign">Campaign</button>
-              <button class="analyzer-mode-btn" data-mode="adventure">Adventure</button>
-            </div>
-            <div id="analyzer-content"></div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(overlay);
-
-    // Nếu đã có data từ trước, render lại
-    if (hasFile && this._lastData) {
-      this._renderResults(this._lastData.campaign, overlay.querySelector('#analyzer-content'));
-      this._bindModeToggle(overlay);
-    }
-
-    // Bind events
-    this._bindPanelEvents(overlay);
-  },
-
-  _bindPanelEvents(overlay) {
-    const close = () => { overlay.remove(); this._overlay = null; };
-    overlay.querySelector('.popup-close').onclick = close;
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
-
-    // Nút chọn file
-    overlay.querySelector('#analyzer-pick').onclick = () => this._pickFile(overlay);
-
-    // Nút reload (nếu có)
-    const reloadBtn = overlay.querySelector('#analyzer-reload');
-    if (reloadBtn) reloadBtn.onclick = () => this._reloadFile(overlay);
-
-    // Drop zone (nếu có)
-    const dropArea = overlay.querySelector('#analyzer-drop');
-    if (dropArea) {
-      dropArea.onclick = () => this._pickFile(overlay);
-      ['dragenter', 'dragover'].forEach(evt =>
-        dropArea.addEventListener(evt, (e) => { e.preventDefault(); dropArea.classList.add('highlight'); })
-      );
-      ['dragleave', 'drop'].forEach(evt =>
-        dropArea.addEventListener(evt, (e) => { e.preventDefault(); dropArea.classList.remove('highlight'); })
-      );
-      dropArea.addEventListener('drop', (e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        if (file) this._processFile(file, null, overlay);
-      });
-    }
-
-    // ESC close
-    const escHandler = (e) => {
-      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', escHandler); }
-    };
-    document.addEventListener('keydown', escHandler);
-  },
-
-  /**
-   * Chọn file bằng File System Access API (Chrome/Edge) hoặc fallback input
-   */
-  async _pickFile(overlay) {
-    // Thử File System Access API trước (cho phép reload sau này)
-    if (window.showOpenFilePicker) {
-      try {
-        const [handle] = await window.showOpenFilePicker({
-          types: [{
-            description: 'Remnant Save File',
-            accept: { 'application/octet-stream': ['.sav', '.bak'] },
-          }],
-          startIn: 'desktop',
-        });
-        this._fileHandle = handle;
-        const file = await handle.getFile();
-        this._processFile(file, handle, overlay);
-        return;
-      } catch (e) {
-        if (e.name === 'AbortError') return; // User cancelled
-      }
-    }
-
-    // Fallback cho Firefox / trình duyệt không hỗ trợ
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.sav,.bak';
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) this._processFile(file, null, overlay);
-    };
-    input.click();
-  },
-
-  /**
-   * Reload file đã chọn trước đó (không cần chọn lại)
-   */
-  async _reloadFile(overlay) {
-    if (!this._fileHandle) return;
-
-    const reloadBtn = overlay.querySelector('#analyzer-reload');
-    if (reloadBtn) {
-      reloadBtn.disabled = true;
-      reloadBtn.innerHTML = '⏳ Đang đọc...';
-    }
-
-    try {
-      const file = await this._fileHandle.getFile();
-      this._processFile(file, this._fileHandle, overlay);
-    } catch (e) {
-      // Permission bị revoke → phải chọn lại
-      this._fileHandle = null;
-      this.showPanel();
-    }
-  },
-
-  /**
-   * Xử lý file save: parse và hiển thị kết quả
-   */
-  _processFile(file, handle, overlay) {
-    if (handle) this._fileHandle = handle;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const raw = e.target.result;
-      const campaign = this._parseCampaign(raw);
-      const adventure = this._parseAdventure(raw);
-      this._lastData = { campaign, adventure };
-
-      // Refresh panel với data mới
-      overlay.remove();
-      this._overlay = null;
-      this.showPanel();
-    };
-    reader.readAsText(file);
-  },
-
-  _bindModeToggle(overlay) {
-    overlay.querySelectorAll('.analyzer-mode-btn').forEach(btn => {
-      btn.onclick = () => {
-        overlay.querySelectorAll('.analyzer-mode-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const data = btn.dataset.mode === 'adventure'
-          ? this._lastData.adventure
-          : this._lastData.campaign;
-        this._renderResults(data, overlay.querySelector('#analyzer-content'));
-      };
-    });
-  },
-
-  // === Parsing logic ===
 
   _parseCampaign(raw) {
     let text = raw.split('/Game/Campaign_Main/Quest_Campaign_Ward13.Quest_Campaign_Ward13')[0];
@@ -433,12 +251,12 @@ const Analyzer = {
       if (!world) continue;
 
       let type = null, rawName = null;
-      if (line.includes('SmallD'))        { type = 'Side Dungeon'; rawName = parts[3]?.split('_')[2]; }
-      if (line.includes('OverworldPOI'))   { type = 'Point of Interest'; rawName = parts[3]?.split('_')[2]; }
-      if (line.includes('Quest_Boss'))     { type = 'World Boss'; rawName = parts[3]?.split('_')[2]; }
-      if (line.includes('Siege'))          { type = 'Siege'; rawName = parts[3]?.split('_')[2]; }
-      if (line.includes('Mini'))           { type = 'Miniboss'; rawName = parts[3]?.split('_')[2]; }
-      if (line.includes('Quest_Event'))    { type = 'Event'; rawName = parts[3]?.split('_')[2]; }
+      if (line.includes('SmallD'))       { type = 'Side Dungeon';     rawName = parts[3]?.split('_')[2]; }
+      if (line.includes('OverworldPOI')) { type = 'Point of Interest'; rawName = parts[3]?.split('_')[2]; }
+      if (line.includes('Quest_Boss'))   { type = 'World Boss';        rawName = parts[3]?.split('_')[2]; }
+      if (line.includes('Siege'))        { type = 'Siege';             rawName = parts[3]?.split('_')[2]; }
+      if (line.includes('Mini'))         { type = 'Miniboss';          rawName = parts[3]?.split('_')[2]; }
+      if (line.includes('Quest_Event'))  { type = 'Event';             rawName = parts[3]?.split('_')[2]; }
 
       if (!type || !rawName) continue;
 
@@ -451,52 +269,10 @@ const Analyzer = {
 
       events.push({ world, type, rawName, name: displayName, sublocation });
     }
+
     return events;
   },
 
-  // === Rendering ===
-
-  _renderResults(events, container) {
-    if (!events || !events.length) {
-      container.innerHTML = '<div class="analyzer-empty">Không tìm thấy dữ liệu. Hãy chắc chắn đã travel đến ít nhất 1 checkpoint (red crystal) trong game.</div>';
-      return;
-    }
-
-    const byWorld = {};
-    for (const evt of events) {
-      if (!byWorld[evt.world]) byWorld[evt.world] = [];
-      byWorld[evt.world].push(evt);
-    }
-
-    const worldColors = {
-      Earth: '#e74c3c', Rhom: '#f39c12', Corsus: '#27ae60',
-      Yaesha: '#3498db', Reisum: '#8e44ad',
-    };
-
-    let html = '';
-    for (const [world, worldEvents] of Object.entries(byWorld)) {
-      const color = worldColors[world] || '#666';
-      html += `<div class="analyzer-world">
-        <div class="analyzer-world-header" style="border-left: 4px solid ${color}">
-          <strong>${world}</strong>
-          <span class="analyzer-count">${worldEvents.length} items</span>
-        </div>`;
-
-      for (const evt of worldEvents) {
-        const typeClass = evt.type.includes('Boss') ? 'type-boss'
-          : evt.type.includes('Dungeon') ? 'type-dungeon'
-          : evt.type.includes('Event') || evt.type.includes('Interest') ? 'type-event'
-          : 'type-other';
-
-        html += `<div class="analyzer-event">
-          <span class="analyzer-type ${typeClass}">${evt.type}</span>
-          <span class="analyzer-name">${evt.name}</span>
-          ${evt.sublocation ? `<span class="analyzer-subloc">${evt.sublocation}</span>` : ''}
-        </div>`;
-      }
-      html += '</div>';
-    }
-
-    container.innerHTML = html;
-  },
+  // Legacy stub
+  showPanel() { document.querySelector('.page-btn[data-page="analyzer"]')?.click(); },
 };
