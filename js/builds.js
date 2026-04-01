@@ -73,12 +73,18 @@ const Builds = {
   _detailId: null,
 
   _nameToId(name) {
+    const r = this._findFull(name);
+    return r ? r.item.id : null;
+  },
+
+  _findFull(name) {
+    if (!name) return null;
     const norm = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-    for (const sec of Object.values(GAME_DATA)) {
+    for (const [sk, sec] of Object.entries(GAME_DATA)) {
       for (const cat of Object.values(sec.categories)) {
         for (const item of cat.items) {
           const n = item.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-          if (n === norm || n.startsWith(norm) || norm.startsWith(n)) return item.id;
+          if (n === norm || n.startsWith(norm) || norm.startsWith(n)) return { item, sectionKey: sk };
         }
       }
     }
@@ -183,21 +189,29 @@ const Builds = {
     const eq = build.equipment;
     const prog = this._getProgress(build);
 
-    const makeEqRows = (label, icon, names) => {
+    const makeEqCards = (label, names) => {
       if (!names) return '';
       const arr = Array.isArray(names) ? names : [names];
       return arr.map(name => {
-        const itemId = this._nameToId(name);
-        const collected = itemId && State.isCollected(itemId);
-        const cls = !itemId ? 'unknown' : collected ? 'have' : 'missing';
-        const badge = !itemId ? '' : collected
-          ? `<span class="build-detail-item-badge badge-have">✓ Đã có</span>`
-          : `<span class="build-detail-item-badge badge-missing">Chưa có</span>`;
-        return `<div class="build-detail-item ${cls}">
-          <span class="build-detail-item-icon">${icon}</span>
-          <div class="build-detail-item-info">
-            <div class="build-detail-item-label">${label}</div>
-            <div class="build-detail-item-name">${name}${badge}</div>
+        const found = this._findFull(name);
+        const item = found?.item;
+        const sk = found?.sectionKey;
+        const collected = item && State.isCollected(item.id);
+        const cls = !item ? 'unknown' : collected ? 'have' : 'missing';
+
+        const imgEl = item?.image
+          ? `<img src="${item.image}" alt="${name}" loading="lazy" onerror="this.style.display='none'">`
+          : '';
+
+        return `<div class="bd-item-card ${cls} ${item ? 'bd-item-card--click' : ''}"
+                    ${item ? `data-item-id="${item.id}" data-sk="${sk}"` : ''}>
+          <div class="bd-item-img">${imgEl}</div>
+          <div class="bd-item-info">
+            <div class="bd-item-label">${label}</div>
+            <div class="bd-item-name">${name}</div>
+            ${collected
+              ? `<span class="bd-item-badge have-badge">✓ Đã có</span>`
+              : item ? `<span class="bd-item-badge missing-badge">Chưa có</span>` : ''}
           </div>
         </div>`;
       }).join('');
@@ -212,22 +226,25 @@ const Builds = {
         <div class="build-detail-grid">
           <div class="build-detail-section">
             <h4>Equipment</h4>
-            ${makeEqRows('Long Gun', '🔫', eq.longGun)}
-            ${makeEqRows('Hand Gun', '🔫', eq.handGun)}
-            ${makeEqRows('Melee', '⚔️', eq.melee)}
-            ${makeEqRows('Mod', '🔮', eq.mods)}
-            ${makeEqRows('Armor', '🛡️', eq.armor)}
-            ${makeEqRows('Amulet', '📿', eq.amulet)}
-            ${makeEqRows('Ring', '💍', eq.rings)}
+            <div class="bd-items-grid">
+              ${makeEqCards('Long Gun', eq.longGun)}
+              ${makeEqCards('Hand Gun', eq.handGun)}
+              ${makeEqCards('Melee', eq.melee)}
+              ${makeEqCards('Mod', eq.mods)}
+              ${makeEqCards('Armor', eq.armor)}
+              ${makeEqCards('Amulet', eq.amulet)}
+              ${makeEqCards('Ring', eq.rings)}
+            </div>
           </div>
           ${build.traits?.length ? `
           <div class="build-detail-section">
             <h4>Key Traits</h4>
             <div class="build-traits-grid">
               ${build.traits.map(t => {
-                const tid = this._nameToId(t);
-                const cls = tid && State.isCollected(tid) ? 'have' : '';
-                return `<span class="build-trait ${cls}">${t}</span>`;
+                const found = this._findFull(t);
+                const collected = found && State.isCollected(found.item.id);
+                return `<span class="build-trait ${collected ? 'have' : ''} ${found ? 'build-trait--click' : ''}"
+                             ${found ? `data-item-id="${found.item.id}" data-sk="${found.sectionKey}"` : ''}>${t}</span>`;
               }).join('')}
             </div>
           </div>` : ''}
@@ -235,11 +252,32 @@ const Builds = {
       </div>`;
 
     detailEl.classList.add('active');
+
     document.getElementById('build-back').onclick = () => {
       this._detailId = null;
       detailEl.classList.remove('active');
       list.style.display = '';
     };
+
+    // Click equipment card → mở popup
+    detailEl.querySelectorAll('.bd-item-card--click').forEach(card => {
+      card.onclick = () => {
+        const { itemId, sk } = card.dataset;
+        const item = Object.values(GAME_DATA[sk]?.categories || {})
+          .flatMap(c => c.items).find(i => i.id === itemId);
+        if (item) Popup.showItem(item, sk);
+      };
+    });
+
+    // Click trait tag → mở popup
+    detailEl.querySelectorAll('.build-trait--click').forEach(tag => {
+      tag.onclick = () => {
+        const { itemId, sk } = tag.dataset;
+        const item = Object.values(GAME_DATA[sk]?.categories || {})
+          .flatMap(c => c.items).find(i => i.id === itemId);
+        if (item) Popup.showItem(item, sk);
+      };
+    });
   },
 
   // Legacy popup method (giữ lại để không break)
