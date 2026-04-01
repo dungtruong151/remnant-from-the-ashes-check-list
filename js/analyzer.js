@@ -152,24 +152,9 @@ const Analyzer = {
       byWorld[e.world].push(e);
     }
 
-    // Group each world by type
-    const typeOrder = ['World Boss', 'Side Dungeon', 'Point of Interest', 'Siege', 'Miniboss', 'Event'];
-    const typeLabel = {
-      'World Boss': 'World Boss',
-      'Side Dungeon': 'Dungeon',
-      'Point of Interest': 'POI',
-      'Siege': 'Siege',
-      'Miniboss': 'Miniboss',
-      'Event': 'Event',
-    };
-    const typeCls = {
-      'World Boss': 'type-boss',
-      'Side Dungeon': 'type-dungeon',
-      'Point of Interest': 'type-event',
-      'Siege': 'type-other',
-      'Miniboss': 'type-other',
-      'Event': 'type-event',
-    };
+    const typeOrder = ['World Boss', 'Side Dungeon', 'Miniboss', 'Siege', 'Point of Interest', 'Event'];
+    const typeLabel = { 'World Boss': 'Boss', 'Side Dungeon': 'Dungeon', 'Point of Interest': 'POI', 'Siege': 'Siege', 'Miniboss': 'Mini', 'Event': 'Event' };
+    const typeCls   = { 'World Boss': 'type-boss', 'Side Dungeon': 'type-dungeon', 'Point of Interest': 'type-event', 'Siege': 'type-other', 'Miniboss': 'type-other', 'Event': 'type-event' };
 
     return Object.entries(byWorld).map(([world, evts]) => {
       const byType = {};
@@ -178,25 +163,68 @@ const Analyzer = {
         byType[e.type].push(e);
       }
 
-      const rows = typeOrder
-        .filter(t => byType[t])
-        .flatMap(t => byType[t].map(e => `
-          <div class="analyzer-event">
-            <span class="event-type-tag ${typeCls[t]}">${typeLabel[t]}</span>
-            <span class="event-name">${e.name}</span>
-            ${e.sublocation ? `<span class="event-sub">${e.sublocation}</span>` : ''}
-          </div>`))
-        .join('');
+      const sections = typeOrder.filter(t => byType[t]).map(t => {
+        const cards = byType[t].map(e => {
+          const item = this._findItem(e.name);
+          const collected = item && State.isCollected(item.id);
+          const hasImg = item?.image;
+
+          const img = hasImg
+            ? `<img src="${item.image}" alt="${e.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.classList.add('no-img')">`
+            : '';
+
+          return `
+            <div class="acard ${collected ? 'acard--collected' : ''} ${hasImg ? '' : 'acard--no-img'}">
+              <div class="acard-img">${img}<span class="acard-img-placeholder">${collected ? '✓' : ''}</span></div>
+              <div class="acard-body">
+                <div class="acard-name">${e.name}</div>
+                ${e.sublocation ? `<div class="acard-sub">${e.sublocation}</div>` : ''}
+                <div class="acard-footer">
+                  <span class="event-type-tag ${typeCls[t]}">${typeLabel[t]}</span>
+                  ${collected
+                    ? `<span class="acard-collected">✓ Đã có</span>`
+                    : item ? `<span class="acard-missing">Chưa có</span>` : ''}
+                </div>
+              </div>
+            </div>`;
+        }).join('');
+
+        return `<div class="analyzer-type-section">
+          <div class="analyzer-type-label">${typeLabel[t]} <span>${byType[t].length}</span></div>
+          <div class="acard-grid">${cards}</div>
+        </div>`;
+      }).join('');
+
+      const total = evts.length;
+      const collectedCount = evts.filter(e => { const it = this._findItem(e.name); return it && State.isCollected(it.id); }).length;
 
       return `
-        <div class="analyzer-world">
+        <div class="analyzer-world-block">
           <div class="analyzer-world-header">
-            <span>${world}</span>
-            <span class="analyzer-world-count">${evts.length} items</span>
+            <span class="aworld-name">${world}</span>
+            <span class="aworld-meta">${collectedCount ? `${collectedCount}/${total} đã có` : `${total} items`}</span>
           </div>
-          <div class="analyzer-events">${rows}</div>
+          ${sections}
         </div>`;
     }).join('');
+  },
+
+  // === Checklist integration ===
+
+  /** Tìm item trong GAME_DATA khớp với tên event từ analyzer */
+  _findItem(eventName) {
+    if (!eventName) return null;
+    const norm = s => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const target = norm(eventName);
+    for (const sec of Object.values(GAME_DATA)) {
+      for (const cat of Object.values(sec.categories)) {
+        for (const item of cat.items) {
+          const n = norm(item.name);
+          if (n === target || n.includes(target) || target.includes(n)) return item;
+        }
+      }
+    }
+    return null;
   },
 
   // === File reading & parsing ===

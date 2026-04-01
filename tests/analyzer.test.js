@@ -174,8 +174,8 @@ describe('Analyzer - UI', () => {
     };
     Analyzer.renderPage();
     const container = document.getElementById('analyzer-page-content');
-    expect(container.querySelectorAll('.analyzer-world').length).toBe(2);
-    expect(container.querySelectorAll('.analyzer-event').length).toBe(2);
+    expect(container.querySelectorAll('.analyzer-world-block').length).toBe(2);
+    expect(container.querySelectorAll('.acard').length).toBe(2);
     expect(container.textContent).toContain('Gorefist');
     expect(container.textContent).toContain('The Harrow');
   });
