@@ -12,6 +12,7 @@
   document.getElementById('filter-rarity').addEventListener('change', () => Renderer.renderAll());
   document.getElementById('filter-status').addEventListener('change', () => Renderer.renderAll());
   document.getElementById('btn-reset').addEventListener('click', () => Popup.showResetConfirm());
+  document.getElementById('btn-builds').addEventListener('click', () => Builds.showPanel());
   document.getElementById('btn-analyzer').addEventListener('click', () => Analyzer.showPanel());
   document.getElementById('btn-profiles').addEventListener('click', () => Profiles.showPanel());
 
