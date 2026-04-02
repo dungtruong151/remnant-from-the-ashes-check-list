@@ -48,7 +48,7 @@ describe('State - Toggle items', () => {
 describe('State - Counting', () => {
   test('countAll() trả đúng khi chưa collect gì', () => {
     const c = State.countAll();
-    expect(c.total).toBe(299);
+    expect(c.total).toBe(300);
     expect(c.collected).toBe(0);
   });
 

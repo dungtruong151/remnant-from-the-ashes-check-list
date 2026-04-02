@@ -32,7 +32,7 @@ describe('GAME_DATA integrity', () => {
         total += cat.items.length;
       }
     }
-    expect(total).toBe(299);
+    expect(total).toBe(300);
   });
 
   test('mỗi section có label và icon', () => {
@@ -94,7 +94,7 @@ describe('GAME_DATA integrity', () => {
     expect(counts.armor).toBe(18);
     expect(counts.bosses).toBe(33);
     expect(counts.traits).toBe(50);
-    expect(counts.mods).toBe(39);
+    expect(counts.mods).toBe(40);
     expect(counts.rings).toBe(74);
     expect(counts.amulets).toBe(36);
   });
