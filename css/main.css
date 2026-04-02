@@ -601,15 +601,15 @@ body {
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 5px;
-  border: 1px solid var(--border);
-  background: var(--surface-2);
-  color: var(--text-2);
+  border: 1px solid transparent;
+  background: #2a2a2e;
+  color: rgba(255,255,255,0.75);
   font-weight: 500;
   transition: all var(--transition);
 }
-.build-trait.have { background: var(--green-bg); border-color: #86efac; color: var(--green-2); font-weight: 600; }
+.build-trait.have { background: var(--green-2); border-color: transparent; color: #fff; font-weight: 600; }
 .build-trait--click { cursor: pointer; }
-.build-trait--click:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+.build-trait--click:hover { background: var(--accent); color: #fff; transform: translateY(-1px); }
 
 /* ============================================================
    ANALYZER PAGE
