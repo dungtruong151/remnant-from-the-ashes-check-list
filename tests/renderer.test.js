@@ -48,13 +48,13 @@ describe('Renderer - renderAll()', () => {
   test('render tạo item cards', () => {
     Renderer.renderAll();
     const cards = document.querySelectorAll('.item-card');
-    expect(cards.length).toBe(305);
+    expect(cards.length).toBe(343);
   });
 
   test('global stats hiển thị 0% ban đầu', () => {
     Renderer.renderAll();
     expect(document.getElementById('total-progress').textContent).toBe('0%');
-    expect(document.getElementById('total-collected').textContent).toBe('0/305');
+    expect(document.getElementById('total-collected').textContent).toBe('0/343');
     expect(document.getElementById('total-sections-text').textContent).toBe('0/7 danh mục');
   });
 });
@@ -88,7 +88,7 @@ describe('Renderer - collected state', () => {
   test('global stats cập nhật khi có items collected', () => {
     State.collected = { hunting_rifle: true, ruin: true, devastator: true };
     Renderer.renderAll();
-    expect(document.getElementById('total-collected').textContent).toBe('3/305');
+    expect(document.getElementById('total-collected').textContent).toBe('3/343');
     expect(document.getElementById('total-progress').textContent).toBe('1%');
   });
 

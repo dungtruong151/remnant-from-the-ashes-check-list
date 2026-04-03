@@ -378,6 +378,8 @@ body {
 }
 .item-card:hover .item-image-wrap img { transform: scale(1.06); }
 .item-card.collected .item-image-wrap { background: #dcfce7; border-color: #bbf7d0; }
+#section-traits .item-image-wrap { background: #1a1a1e; }
+#section-traits .item-card.collected .item-image-wrap { background: #1a3a2a; border-color: #2d5a40; }
 .item-image-placeholder { font-size: 2rem; color: var(--border-2); }
 
 .item-collected-badge {
@@ -602,8 +604,8 @@ body {
   padding: 4px 10px;
   border-radius: 5px;
   border: 1px solid transparent;
-  background: #2a2a2e;
-  color: rgba(255,255,255,0.75);
+  background: var(--surface-2);
+  color: var(--text-2);
   font-weight: 500;
   transition: all var(--transition);
 }

@@ -5,7 +5,7 @@
 const BUILDS_DATA = [
   { id:"melting_pot", name:"Melting Pot", author:"ZAKR13L", playstyle:"DPS",
     desc:"Dọn quái tốt, cực mạnh khi đối đầu boss. Chú ý fat-roll cần luyện tập.",
-    equipment:{ longGun:"Beam Rifle", handGun:"Submachine Gun", melee:"Guardian Axe", mods:["Hunter's Mark","Swarm"], armor:"Radiant Set", amulet:"Storm Amulet", rings:["Stone of Balance","Devouring Loop"] },
+    equipment:{ longGun:"Beam Rifle", handGun:"Submachine Gun", melee:"Guardian Axe", mods:["Hunter's Mark","Swarm"], head:"Radiant Visage", body:"Radiant Protector", leg:"Radiant Greaves", amulet:"Storm Amulet", rings:["Stone of Balance","Devouring Loop"] },
     traits:["Quick Hands","Executioner","Kingslayer","Trigger Happy","Exploiter","Mind's Eye","Vigor","Endurance","Mother's Blessing","Keeper's Blessing","Guardian's Blessing","Bark Skin","Spirit","World Walker","Recovery","Glutton","Handling","Arcane Strike","Swiftness","Warrior","Rapid Strike"] },
   { id:"just_melts", name:"Just Melts", author:"Anonymous", playstyle:"DPS",
     desc:"Build đơn giản, sát thương cao với Hot Shot + Song of Swords.",
@@ -13,60 +13,60 @@ const BUILDS_DATA = [
     traits:["Quick Hands","Vigor","Endurance","Mind's Eye","Kingslayer","Executioner","Trigger Happy","Exploiter","Spirit","Catalyst"] },
   { id:"crit_crusher", name:"Crit Crusher", author:"Roran", playstyle:"Crit",
     desc:"Eye of the Storm + Static Field Shot + Breath of the Desert. Crit synergy cao.",
-    equipment:{ longGun:"Eye of the Storm", handGun:"Submachine Gun", mods:["Static Field Shot","Breath of the Desert"], armor:"Hunter Set", amulet:"Storm Amulet", rings:["Devouring Loop","Heartseeker"] },
+    equipment:{ longGun:"Eye of the Storm", handGun:"Submachine Gun", mods:["Static Field Shot","Breath of the Desert"], head:"Hunter Shroud", body:"Hunter Trenchcoat", leg:"Hunter Pants", amulet:"Storm Amulet", rings:["Devouring Loop","Heartseeker"] },
     traits:["Shadow Walker","Exploiter","Spirit","Quick Hands","Executioner","Kingslayer","Mind's Eye","Catalyst"] },
   { id:"one_shot", name:"One-Shot", author:"Dareitus", playstyle:"Burst",
     desc:"+40% crit chance cơ bản. +35% bonus damage mỗi viên. Crossbow cần kỹ năng.",
-    equipment:{ longGun:"Crossbow", mods:["Hunter's Mark"], armor:"Slayer Set", amulet:"Gunslinger's Charm", rings:["Heartseeker","Braided Thorns"] },
+    equipment:{ longGun:"Crossbow", mods:["Hunter's Mark"], head:"Slayer Mask", body:"Slayer Mantle", leg:"Slayer Boots", amulet:"Gunslinger's Charm", rings:["Heartseeker","Braided Thorns"] },
     traits:["Executioner","Quick Hands","Exploiter","Kingslayer","Mind's Eye"] },
   { id:"the_unkillable", name:"The Unkillable", author:"Blankfacegamer", playstyle:"Tank",
     desc:"Build gần như bất tử — Ruin (tự hồi sinh) + Cultist Set + Leech Ember.",
-    equipment:{ longGun:"Ruin", mods:["Undying"], armor:"Cultist's Set", amulet:"Galenic Charm", rings:["Leech Ember","Root Circlet"] },
+    equipment:{ longGun:"Ruin", mods:["Undying"], head:"Cultist Hat", body:"Cultist Duster", leg:"Cultist Britches", amulet:"Galenic Charm", rings:["Leech Ember","Root Circlet"] },
     traits:["Vigor","Endurance","Spirit","Recovery","Triage"] },
   { id:"heavy_hitter_sustained", name:"Heavy Hitter (Sustained)", author:"Plat", playstyle:"DPS",
     desc:"Sustained DPS cao với Sporebloom. Mix giáp Drifter + Slayer + Bandit.",
-    equipment:{ longGun:"Sporebloom", handGun:"Magnum Revolver", mods:["Spore Shot","Hot Shot"], armor:"Drifter's Set", amulet:"Gunslinger's Charm", rings:["Devouring Loop","Stone of Balance"] },
+    equipment:{ longGun:"Sporebloom", handGun:"Magnum Revolver", mods:["Spore Shot","Hot Shot"], head:"Drifter's Mask", body:"Drifter's Overcoat", leg:"Drifter's Trousers", amulet:"Gunslinger's Charm", rings:["Devouring Loop","Stone of Balance"] },
     traits:["Quick Hands","Executioner","Kingslayer","Mind's Eye","Exploiter","Trigger Happy"] },
   { id:"heavy_hitter_elemental", name:"Heavy Hitter (Elemental)", author:"Plat", playstyle:"Elemental",
     desc:"Elemental burst với Sporebloom (Rot) + Spitfire (Fire). Crit synergy.",
-    equipment:{ longGun:"Sporebloom", handGun:"Spitfire", mods:["Spore Shot","Flame Thrower"], armor:"Slayer Set", amulet:"Storm Amulet", rings:["Devouring Loop","Stone of Balance"] },
+    equipment:{ longGun:"Sporebloom", handGun:"Spitfire", mods:["Spore Shot","Flame Thrower"], head:"Slayer Mask", body:"Slayer Mantle", leg:"Slayer Boots", amulet:"Storm Amulet", rings:["Devouring Loop","Stone of Balance"] },
     traits:["Executioner","Kingslayer","Mind's Eye","Exploiter","Catalyst"] },
   { id:"crit_build", name:"Crit Build", author:"HolyApplebutter", playstyle:"Crit",
     desc:"Radiant Set + Chicago Typewriter cho crit DPS liên tục.",
-    equipment:{ longGun:"Chicago Typewriter", handGun:"Submachine Gun", mods:["Hunter's Mark","Breath of the Desert"], armor:"Radiant Set", amulet:"Gunslinger's Charm", rings:["Braided Thorns","Stone of Balance"] },
+    equipment:{ longGun:"Chicago Typewriter", handGun:"Submachine Gun", mods:["Hunter's Mark","Breath of the Desert"], head:"Radiant Visage", body:"Radiant Protector", leg:"Radiant Greaves", amulet:"Gunslinger's Charm", rings:["Braided Thorns","Stone of Balance"] },
     traits:["Executioner","Kingslayer","Quick Hands","Trigger Happy","Mind's Eye","Spirit"] },
   { id:"headhunter", name:"The Headhunter", author:"Anonymous", playstyle:"Crit",
     desc:"Hunter Set + Hunter's Mark tăng weak spot damage tối đa.",
-    equipment:{ longGun:"Assault Rifle", handGun:"Hunting Pistol", mods:["Hunter's Mark","Song of Swords"], armor:"Hunter Set", amulet:"Gunslinger's Charm", rings:["Braided Thorns","Hunter's Band"] },
+    equipment:{ longGun:"Assault Rifle", handGun:"Hunting Pistol", mods:["Hunter's Mark","Song of Swords"], head:"Hunter Shroud", body:"Hunter Trenchcoat", leg:"Hunter Pants", amulet:"Gunslinger's Charm", rings:["Braided Thorns","Hunter's Band"] },
     traits:["Executioner","Exploiter","Quick Hands","Kingslayer","Mind's Eye"] },
   { id:"devastation", name:"Devastation", author:"Anonymous", playstyle:"Burst",
     desc:"Void Set chuyển damage nhận thành damage gây ra. Cực nguy hiểm nhưng sát thương khổng lồ.",
-    equipment:{ longGun:"Devastator", handGun:"Hunting Pistol", mods:["Skewer","Hunter's Mark"], armor:"Void Set", amulet:"Leto's Amulet", rings:["Braided Thorns","Jewel of the Black Sun"] },
+    equipment:{ longGun:"Devastator", handGun:"Hunting Pistol", mods:["Skewer","Hunter's Mark"], head:"Void Skull", body:"Void Carapace", leg:"Void Greaves", amulet:"Leto's Amulet", rings:["Braided Thorns","Jewel of the Black Sun"] },
     traits:["Kingslayer","Executioner","Mind's Eye","Exploiter","Quick Hands"] },
   { id:"immortal_summoner", name:"Immortal Summoner", author:"Anonymous", playstyle:"Summon",
     desc:"Cultist Set + summon build. Soul Link hồi máu từ summon damage. Tốt cho co-op.",
-    equipment:{ longGun:"Chicago Typewriter", handGun:"Submachine Gun", mods:["Seeker","Beckon"], armor:"Cultist's Set", amulet:"Soul Anchor", rings:["Soul Link","Soul Ember"] },
+    equipment:{ longGun:"Chicago Typewriter", handGun:"Submachine Gun", mods:["Seeker","Beckon"], head:"Cultist Hat", body:"Cultist Duster", leg:"Cultist Britches", amulet:"Soul Anchor", rings:["Soul Link","Soul Ember"] },
     traits:["Spirit","Invoker","Arcane Strike","Vigor","Recovery"] },
   { id:"crit_one_shot", name:"Crit One-Shot", author:"Anonymous", playstyle:"Burst",
     desc:"Slayer Set + Sniper Rifle cho đòn 1-shot chí mạng cực mạnh.",
-    equipment:{ longGun:"Sniper Rifle", handGun:"Hunting Pistol", mods:["Hunter's Mark","Song of Swords"], armor:"Slayer Set", amulet:"Gunslinger's Charm", rings:["Heartseeker","Hunter's Band"] },
+    equipment:{ longGun:"Sniper Rifle", handGun:"Hunting Pistol", mods:["Hunter's Mark","Song of Swords"], head:"Slayer Mask", body:"Slayer Mantle", leg:"Slayer Boots", amulet:"Gunslinger's Charm", rings:["Heartseeker","Hunter's Band"] },
     traits:["Executioner","Kingslayer","Quick Hands","Exploiter","Mind's Eye"] },
   { id:"bottomless_stock", name:"Bottomless Stock", author:"Anonymous", playstyle:"Sustain",
     desc:"Bandit Set hoàn đạn liên tục. Không bao giờ hết đạn.",
-    equipment:{ longGun:"Chicago Typewriter", handGun:"Spitfire", mods:["Iron Sentinel","Flame Thrower"], armor:"Bandit Set", amulet:"Gunslinger's Charm", rings:["Stockpile Circlet","Ring of Elusion"] },
+    equipment:{ longGun:"Chicago Typewriter", handGun:"Spitfire", mods:["Iron Sentinel","Flame Thrower"], head:"Bandit's Mask", body:"Bandit Jacket", leg:"Bandit Trousers", amulet:"Gunslinger's Charm", rings:["Stockpile Circlet","Ring of Elusion"] },
     traits:["Quick Hands","Trigger Happy","Executioner","Spirit","Recovery"] },
   { id:"crit_auto_no_dlc", name:"Crit Auto (No DLC)", author:"Anonymous", playstyle:"Crit",
     desc:"Build crit không cần DLC. Radiant Set + Beam Rifle + Swarm.",
-    equipment:{ longGun:"Beam Rifle", handGun:"Submachine Gun", mods:["Swarm","Hunter's Mark"], armor:"Radiant Set", amulet:"Gunslinger's Charm", rings:["Devouring Loop","Braided Thorns"] },
+    equipment:{ longGun:"Beam Rifle", handGun:"Submachine Gun", mods:["Swarm","Hunter's Mark"], head:"Radiant Visage", body:"Radiant Protector", leg:"Radiant Greaves", amulet:"Gunslinger's Charm", rings:["Devouring Loop","Braided Thorns"] },
     traits:["Executioner","Kingslayer","Quick Hands","Trigger Happy","Mind's Eye","Spirit"] },
   { id:"easy_mode", name:"Easy Mode", author:"Anonymous", playstyle:"DPS",
     desc:"Build dễ chơi. DLC: Machine Pistol + Fan of Knives.",
-    equipment:{ longGun:"Beam Rifle", handGun:"Machine Pistol", mods:["Fan of Knives","Swarm"], armor:"Radiant Set", amulet:"Polished Whetstone", rings:["Ring of the Mantis","Heartseeker"] },
+    equipment:{ longGun:"Beam Rifle", handGun:"Machine Pistol", mods:["Fan of Knives","Swarm"], head:"Radiant Visage", body:"Radiant Protector", leg:"Radiant Greaves", amulet:"Polished Whetstone", rings:["Ring of the Mantis","Heartseeker"] },
     traits:["Executioner","Kingslayer","Quick Hands","Mind's Eye","Exploiter"] },
 ];
 
-const EQ_ICONS = { longGun:"🔫", handGun:"🔫", melee:"⚔️", mods:"🔮", armor:"🛡️", amulet:"📿", rings:"💍" };
-const EQ_LABELS = { longGun:"Long Gun", handGun:"Hand Gun", melee:"Melee", mods:"Mods", armor:"Armor", amulet:"Amulet", rings:"Rings" };
+const EQ_ICONS = { longGun:"🔫", handGun:"🔫", melee:"⚔️", mods:"🔮", head:"🪖", body:"🛡️", leg:"👢", amulet:"📿", rings:"💍" };
+const EQ_LABELS = { longGun:"Long Gun", handGun:"Hand Gun", melee:"Melee", mods:"Mods", head:"Head", body:"Body", leg:"Leg", amulet:"Amulet", rings:"Rings" };
 
 const Builds = {
   _activeStyle: 'all',
@@ -93,7 +93,7 @@ const Builds = {
 
   _getProgress(build) {
     const eq = build.equipment;
-    const items = [eq.longGun, eq.handGun, eq.melee, ...(eq.mods||[]), eq.armor, eq.amulet, ...(eq.rings||[])].filter(Boolean);
+    const items = [eq.longGun, eq.handGun, eq.melee, ...(eq.mods||[]), eq.head, eq.body, eq.leg, eq.amulet, ...(eq.rings||[])].filter(Boolean);
     let have = 0;
     for (const name of items) {
       const id = this._nameToId(name);
@@ -149,7 +149,9 @@ const Builds = {
             <div class="build-equipment">
               ${eq.longGun ? `<div class="build-eq-row"><span class="build-eq-label">Long Gun</span><span class="build-eq-value ${this._itemClass(eq.longGun)}">${eq.longGun}</span></div>` : ''}
               ${eq.handGun ? `<div class="build-eq-row"><span class="build-eq-label">Hand Gun</span><span class="build-eq-value ${this._itemClass(eq.handGun)}">${eq.handGun}</span></div>` : ''}
-              ${eq.armor   ? `<div class="build-eq-row"><span class="build-eq-label">Armor</span><span class="build-eq-value ${this._itemClass(eq.armor)}">${eq.armor}</span></div>` : ''}
+              ${eq.head    ? `<div class="build-eq-row"><span class="build-eq-label">Head</span><span class="build-eq-value ${this._itemClass(eq.head)}">${eq.head}</span></div>` : ''}
+              ${eq.body    ? `<div class="build-eq-row"><span class="build-eq-label">Body</span><span class="build-eq-value ${this._itemClass(eq.body)}">${eq.body}</span></div>` : ''}
+              ${eq.leg     ? `<div class="build-eq-row"><span class="build-eq-label">Leg</span><span class="build-eq-value ${this._itemClass(eq.leg)}">${eq.leg}</span></div>` : ''}
               ${eq.amulet  ? `<div class="build-eq-row"><span class="build-eq-label">Amulet</span><span class="build-eq-value ${this._itemClass(eq.amulet)}">${eq.amulet}</span></div>` : ''}
             </div>
             <div class="build-progress">
@@ -231,7 +233,9 @@ const Builds = {
               ${makeEqCards('Hand Gun', eq.handGun)}
               ${makeEqCards('Melee', eq.melee)}
               ${makeEqCards('Mod', eq.mods)}
-              ${makeEqCards('Armor', eq.armor)}
+              ${makeEqCards('Head', eq.head)}
+              ${makeEqCards('Body', eq.body)}
+              ${makeEqCards('Leg', eq.leg)}
               ${makeEqCards('Amulet', eq.amulet)}
               ${makeEqCards('Ring', eq.rings)}
             </div>
