@@ -191,6 +191,12 @@ const Popup = {
       State.toggle(item.id);
       overlay.remove();
       Renderer.renderAll();
+      if (typeof Analyzer !== 'undefined' && Analyzer._lastData) {
+        Analyzer.renderPage();
+      }
+      if (typeof Builds !== 'undefined') {
+        Builds.renderPage();
+      }
     };
 
     const escHandler = (e) => {
